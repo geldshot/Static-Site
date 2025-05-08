@@ -2,7 +2,15 @@ import unittest
 
 from src.node.leafnode import LeafNode
 from src.node.textnode import TextNode, TextType
-from src.node.util import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_images, split_nodes_links
+from src.node.util import (
+    text_node_to_html_node, 
+    split_nodes_delimiter, 
+    extract_markdown_images, 
+    extract_markdown_links, 
+    split_nodes_images, 
+    split_nodes_links, 
+    text_to_textnodes
+)
 
 class TestTextToHTML(unittest.TestCase):
     def test_text(self):
@@ -241,4 +249,27 @@ class TestSplitNodesLinks(unittest.TestCase):
         actual = split_nodes_links([node])
 
         self.assertEqual(1, len(actual))
+        self.assertEqual(expected, actual)
+
+class TestSplitTextToNodes(unittest.TestCase):
+    def test_empty(self):
+        text = ""
+        expected = []
+
+        actual = text_to_textnodes(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_simple(self):
+        text = "this is a simple **bold** markdown test with ![image](fail.png)[link](google.com)"
+        expected = [
+            TextNode("this is a simple "),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" markdown test with "),
+            TextNode("image", TextType.IMAGE, "fail.png"),
+            TextNode("link", TextType.LINK, "google.com")
+        ]
+
+        actual = text_to_textnodes(text)
+
         self.assertEqual(expected, actual)
