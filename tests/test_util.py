@@ -2,7 +2,7 @@ import unittest
 
 from src.node.leafnode import LeafNode
 from src.node.textnode import TextNode, TextType
-from src.node.util import text_node_to_html_node, split_nodes_delimiter
+from src.node.util import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 
 class TestTextToHTML(unittest.TestCase):
     def test_text(self):
@@ -64,3 +64,88 @@ class TestSplitDelimiter(unittest.TestCase):
         self.assertEqual(first, nodes[0])
         self.assertEqual(second, nodes[1])
         self.assertEqual(third, nodes[2])
+
+class TestExtractLink(unittest.TestCase):
+    def test_link_extract(self):
+        text = "here's how we do a [link](https://www.google.com)"
+        expected = [("link", "https://www.google.com")]
+
+        actual = extract_markdown_links(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_multiple_link_extract(self):
+        text = "multiple links [link](https://zelda.nintendo.com/) wait that's zelda [zelda](https://www.speedrun.com/botw)"
+        expected = [("link", "https://zelda.nintendo.com/"),
+                    ("zelda", "https://www.speedrun.com/botw")
+                    ]
+
+        actual = extract_markdown_links(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_image_not_extracted(self):
+        text = "here's how we do a ![image](https://www.google.com)"
+        expected = []
+
+        actual = extract_markdown_links(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_no_link_to_extract(self):
+        text = "here's how we do no link"
+        expected = []
+
+        actual = extract_markdown_links(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_empty_link(self):
+        text = "here's how we do a []()"
+        expected = [("", "")]
+
+        actual = extract_markdown_links(text)
+
+        self.assertEqual(expected, actual)
+
+class TestExtractImage(unittest.TestCase):
+    def test_image_extract(self):
+        text = "here's how we do an ![image](https://www.ikea.com/us/en/images/products/blahaj-soft-toy-shark__0710175_pe727378_s5.jpg)"
+        expected = [("image", "https://www.ikea.com/us/en/images/products/blahaj-soft-toy-shark__0710175_pe727378_s5.jpg")]
+
+        actual = extract_markdown_images(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_multiple_image_extract(self):
+        text = "here's how we do an ![tiger](tiger.png) and ![lions](lion.png)"
+        expected = [("tiger", "tiger.png"),
+                    ("lions", "lion.png")]
+
+        actual = extract_markdown_images(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_link_not_extracted(self):
+        text = "here's how we do a [link](https://www.google.com)"
+        expected = []
+
+        actual = extract_markdown_images(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_no_image_to_extract(self):
+        text = "but what if there is no image"
+        expected = []
+
+        actual = extract_markdown_images(text)
+
+        self.assertEqual(expected, actual)
+
+    def test_empty_image(self):
+        text = "or if the image is empty ![]()"
+        expected = [("", "")]
+
+        actual = extract_markdown_images(text)
+
+        self.assertEqual(expected, actual)
