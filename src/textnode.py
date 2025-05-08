@@ -1,7 +1,7 @@
 from enum import Enum
 
 class TextType(Enum):
-    NORMAL = "normal"
+    TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"
     CODE = "code"
@@ -9,7 +9,7 @@ class TextType(Enum):
     IMAGE = "image"
 
 class TextNode():
-    def __init__(self, text, text_type=TextType.NORMAL, url=""):
+    def __init__(self, text, text_type=TextType.TEXT, url=""):
         self.text = text
         self.text_type = text_type
         self.url = url
