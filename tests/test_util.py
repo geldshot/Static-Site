@@ -2,7 +2,7 @@ import unittest
 
 from src.node.leafnode import LeafNode
 from src.node.textnode import TextNode, TextType
-from src.node.util import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from src.node.util import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_images, split_nodes_links
 
 class TestTextToHTML(unittest.TestCase):
     def test_text(self):
@@ -148,4 +148,97 @@ class TestExtractImage(unittest.TestCase):
 
         actual = extract_markdown_images(text)
 
+        self.assertEqual(expected, actual)
+
+class TestSplitNodesImages(unittest.TestCase):
+    def test_simple_split(self):
+        node = TextNode("here's a simple ![split](test.png) okay?")
+        expected = [
+            TextNode("here's a simple "),
+            TextNode("split", TextType.IMAGE, "test.png"),
+            TextNode(" okay?")
+        ]
+
+        actual = split_nodes_images([node])
+
+        self.assertEqual(3, len(actual))
+        self.assertEqual(expected, actual)
+
+    def test_multi_split(self):
+        node = TextNode("now we ![have](multiple.png) for ![split](test.png) okay?")
+        expected = [
+            TextNode("now we "),
+            TextNode("have", TextType.IMAGE, "multiple.png"),
+            TextNode(" for "),
+            TextNode("split", TextType.IMAGE, "test.png"),
+            TextNode(" okay?")
+        ]
+
+        actual = split_nodes_images([node])
+
+        self.assertEqual(5, len(actual))
+        self.assertEqual(expected, actual)
+
+    def test_empty_end_split(self):
+        node = TextNode("no text after ![split](test.png)")
+        expected = [
+            TextNode("no text after "),
+            TextNode("split", TextType.IMAGE, "test.png")
+        ]
+
+        actual = split_nodes_images([node])
+
+        self.assertEqual(2, len(actual))
+        self.assertEqual(expected, actual)
+
+    def test_empty_start_split(self):
+        node = TextNode("![split](test.png) no text before image")
+        expected = [
+            TextNode("split", TextType.IMAGE, "test.png"),
+            TextNode(" no text before image")
+        ]
+
+        actual = split_nodes_images([node])
+
+        self.assertEqual(2, len(actual))
+        self.assertEqual(expected, actual)
+
+class TestSplitNodesLinks(unittest.TestCase):
+    def test_simple_split(self):
+        node = TextNode("here's a simple [split](https://www.google.com) okay?")
+        expected = [
+            TextNode("here's a simple "),
+            TextNode("split", TextType.LINK, "https://www.google.com"),
+            TextNode(" okay?")
+        ]
+
+        actual = split_nodes_links([node])
+
+        self.assertEqual(3, len(actual))
+        self.assertEqual(expected, actual)
+
+    def test_multiple_split(self):
+        node = TextNode("multiple [link](fourswords.com) but no [zelda](minishcap.com) alright?")
+        expected = [
+            TextNode("multiple "),
+            TextNode("link", TextType.LINK, "fourswords.com"),
+            TextNode(" but no "),
+            TextNode("zelda", TextType.LINK, "minishcap.com"),
+            TextNode(" alright?")
+        ]
+
+        actual = split_nodes_links([node])
+
+        self.assertEqual(5, len(actual))
+        self.assertEqual(expected, actual)
+
+    def test_empty_split_combined(self):
+        node = TextNode("[link](butnoends.com)")
+        expected = [
+            TextNode("link", TextType.LINK, "butnoends.com")
+        ]
+
+        actual = split_nodes_links([node])
+
+        self.assertEqual(1, len(actual))
         self.assertEqual(expected, actual)

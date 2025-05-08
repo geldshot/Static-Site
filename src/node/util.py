@@ -47,8 +47,50 @@ def extract_markdown_images(text):
     return matches
 
 def extract_markdown_links(text):
-    regex = "[^\\!]\\[(.*?)\\]\\((.*?)\\)"
+    regex = "(?:^|[^\\!])\\[(.*?)\\]\\((.*?)\\)"
     
     matches = re.findall(regex, text)
     
     return matches
+
+def split_nodes_images(old_nodes):
+    new_nodes = []
+
+    for node in old_nodes:
+        images = extract_markdown_images(node.text)
+        text = node.text
+        
+        for image in images:
+            splits = text.split(f'![{image[0]}]({image[1]})', maxsplit=1 )
+            
+            if splits[0]:
+                new_nodes.append(TextNode(splits[0], node.text_type))
+            
+            new_nodes.append(TextNode(image[0], TextType.IMAGE, image[1]))
+            text = splits[1]
+    
+    if text:
+        new_nodes.append(TextNode(text, node.text_type))
+
+    return new_nodes
+
+def split_nodes_links(old_nodes):
+    new_nodes = []
+
+    for node in old_nodes:
+        links = extract_markdown_links(node.text)
+        text = node.text
+        
+        for link in links:
+            splits = text.split(f'[{link[0]}]({link[1]})', maxsplit=1 )
+
+            if splits[0]:
+                new_nodes.append(TextNode(splits[0], node.text_type))
+            
+            new_nodes.append(TextNode(link[0], TextType.LINK, link[1]))
+            text = splits[1]
+    
+    if text:
+        new_nodes.append(TextNode(text, node.text_type))
+
+    return new_nodes
