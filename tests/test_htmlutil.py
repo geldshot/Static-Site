@@ -1,0 +1,81 @@
+import unittest
+
+from src.node.htmlutil import markdown_to_html_node
+
+class TestMarkdownToHTML(unittest.TestCase):
+    def test_paragraphs(self):
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        )
+
+    def test_codeblock(self):
+        md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
+    
+    def test_ordered_list(self):
+        md = """
+1. this
+2. is
+3. a list
+
+1. second
+2. list
+"""
+
+        expected = "<div><ol><li>1. this</li><li>2. is</li><li>3. a list</li></ol><ol><li>1. second</li><li>2. list</li></ol></div>"
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        
+        self.assertEqual(expected, html)
+
+    def test_unordered_list(self):
+        md = """
+- unordered list
+- tested here
+- for our pleasure
+"""
+
+        expected = "<div><ul><li>unordered list</li><li>tested here</li><li>for our pleasure</li></ul></div>"
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+
+        self.assertEqual(expected, html)    
+
+    def test_heading_list(self):
+        md = """
+### third heading
+
+and a paragraph too!
+"""
+
+        expected = "<div><h3>third heading</h3><p>and a paragraph too!</p></div>"
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+
+        self.assertEqual(expected, html)

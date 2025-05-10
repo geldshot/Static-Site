@@ -14,7 +14,7 @@ def markdown_to_blocks(markdown):
     return blocks
 
 def block_to_block_type(block):
-    if re. match("^#{1,6} .*?", block):
+    if re.match("^#{1,6} .*?", block):
         return BlockType.HEADING
     if block.startswith("```") and block.endswith("```"):
         return BlockType.CODE
