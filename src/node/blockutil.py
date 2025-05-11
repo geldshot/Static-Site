@@ -21,7 +21,7 @@ def block_to_block_type(block):
     
     lines = block.split("\n")
 
-    if [item for item in lines if item.startswith("> ")] == lines:
+    if [item for item in lines if item.startswith(">")] == lines:
         return BlockType.QUOTE
 
     if [item for item in lines if item.startswith("- ")] == lines :

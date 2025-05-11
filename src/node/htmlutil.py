@@ -1,3 +1,4 @@
+import re
 
 from .blockutil import markdown_to_blocks, block_to_block_type
 from .blockutil import BlockType
@@ -39,7 +40,8 @@ def block_to_unordered_list(block):
     return ParentNode("ul", list_html)
 
 def block_to_ordered_list(block):
-    list_items = block.split("\n")
+    regex = "(?:^|\n)\d+\\. (.*)"
+    list_items = re.findall(regex, block)
     list_html = list(map(lambda x: ParentNode("li", map(lambda y: text_node_to_html_node(y), text_to_textnodes(x))), list_items))
     return ParentNode("ol", list_html)
 
@@ -54,7 +56,9 @@ def block_to_heading(block):
     return ParentNode(f'h{heading_count}',list(map(lambda y: text_node_to_html_node(y), text_to_textnodes(block))))
 
 def block_to_quote(block):
-    return ParentNode("blockquote",list(map(lambda y: text_node_to_html_node(y), text_to_textnodes(block))))
+    block = " ".join(list(map(lambda x: x.lstrip("> "), block.split("\n"))))
+    new_block = text_to_textnodes(block)
+    return ParentNode("blockquote",list(map(lambda y: text_node_to_html_node(y), new_block)))
 
 def block_to_paragraph(block):
     block = block.replace("\n", " ")

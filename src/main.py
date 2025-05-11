@@ -2,6 +2,7 @@ import os.path
 import os
 import shutil
 from node.textnode import *
+from node.markdownutil import generate_page
 
 
 def main():
@@ -10,6 +11,8 @@ def main():
     if os.path.exists("./public"):
         shutil.rmtree("./public")
     copy_directory("./static/")
+
+    generate_page("./content/index.md", "./template.html", "./public/index.html")
 
 def copy_directory(source, path="", destination="./public"):
     target = destination + path

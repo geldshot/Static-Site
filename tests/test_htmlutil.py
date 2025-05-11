@@ -45,7 +45,7 @@ the **same** even with inline stuff
 2. list
 """
 
-        expected = "<div><ol><li>1. this</li><li>2. is</li><li>3. a list</li></ol><ol><li>1. second</li><li>2. list</li></ol></div>"
+        expected = "<div><ol><li>this</li><li>is</li><li>a list</li></ol><ol><li>second</li><li>list</li></ol></div>"
 
         node = markdown_to_html_node(md)
         html = node.to_html()
@@ -75,6 +75,19 @@ and a paragraph too!
 
         expected = "<div><h3>third heading</h3><p>and a paragraph too!</p></div>"
 
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+
+        self.assertEqual(expected, html)
+
+    def test_blockquote(self):
+        md = """
+> here I quote myself
+> because I thought this would be easy
+> but it was difficult
+"""
+        expected = "<div><blockquote>here I quote myself because I thought this would be easy but it was difficult</blockquote></div>"
+        
         node = markdown_to_html_node(md)
         html = node.to_html()
 
