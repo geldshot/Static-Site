@@ -14,13 +14,14 @@ def main(args):
     if len(args) > 1:
         basepath = args[1]
 
-    if os.path.exists("./public"):
-        shutil.rmtree("./public")
-        os.mkdir("./public")
+    if os.path.exists("./docs"):
+        shutil.rmtree("./docs")
+    if not os.path.exists("./docs"):
+        os.mkdir("./docs")
 
-    copy_directory("./static/", destination="./public" ,basepath=basepath)
+    copy_directory("./static/", destination="./docs" ,basepath=basepath)
 
-    generate_pages("./content/", destination="./public", template="./template.html", basepath=basepath)
+    generate_pages("./content/", destination="./docs", template="./template.html", basepath=basepath)
 
 def copy_directory(source, path="", destination="./public", basepath="/"):
     target = destination + basepath + path
