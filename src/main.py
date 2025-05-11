@@ -19,12 +19,12 @@ def main(args):
     if not os.path.exists("./docs"):
         os.mkdir("./docs")
 
-    copy_directory("./static/", destination="./docs" ,basepath=basepath)
+    copy_directory("./static/", destination="./docs" )
 
     generate_pages("./content/", destination="./docs", template="./template.html", basepath=basepath)
 
-def copy_directory(source, path="", destination="./public", basepath="/"):
-    target = destination + basepath + path
+def copy_directory(source, path="", destination="./public"):
+    target = destination + "/" + path
 
     if not os.path.exists(target):
         os.mkdir(target)
@@ -35,10 +35,10 @@ def copy_directory(source, path="", destination="./public", basepath="/"):
         if os.path.isfile(source+path+"/"+content):
             shutil.copy(source+path+"/"+content, target)
         else:
-            copy_directory(source, path + content +"/", destination, basepath)
+            copy_directory(source, path + content +"/", destination)
 
 def generate_pages(source, path="", destination="./public", template="./template.html", basepath="/"):
-    target = destination +basepath+ path
+    target = destination +"/"+ path
 
     if not os.path.exists(target):
         os.mkdir(target)
