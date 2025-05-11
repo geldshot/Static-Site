@@ -1,24 +1,32 @@
 import os.path
 import os
 import shutil
+import sys
 from node.textnode import *
 from node.markdownutil import generate_page
 
 
-def main():
+def main(args):
     txtnode = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")
     print(txtnode)
+
+    basepath = "/"
+    if len(args) > 1:
+        basepath = args[1]
+
     if os.path.exists("./public"):
         shutil.rmtree("./public")
-    copy_directory("./static/")
+        os.mkdir("./public")
 
-    generate_pages("./content", destination="./public", template="./template.html")
+    copy_directory("./static/", destination="./public" ,basepath=basepath)
 
-def copy_directory(source, path="", destination="./public"):
-    target = destination + path
-    
-    if not os.path.exists(destination+path):
-        os.mkdir(destination +path)
+    generate_pages("./content/", destination="./public", template="./template.html", basepath=basepath)
+
+def copy_directory(source, path="", destination="./public", basepath="/"):
+    target = destination + basepath + path
+
+    if not os.path.exists(target):
+        os.mkdir(target)
     
     contents = os.listdir(source + path)
     
@@ -26,24 +34,25 @@ def copy_directory(source, path="", destination="./public"):
         if os.path.isfile(source+path+"/"+content):
             shutil.copy(source+path+"/"+content, target)
         else:
-            copy_directory(source, path + "/" + content, destination)
+            copy_directory(source, path + content +"/", destination, basepath)
 
-def generate_pages(source, path="", destination="./public", template="./template.html"):
-    target = destination + path
-    
-    if not os.path.exists(destination+path):
-        os.mkdir(destination +path)
+def generate_pages(source, path="", destination="./public", template="./template.html", basepath="/"):
+    target = destination +basepath+ path
+
+    if not os.path.exists(target):
+        os.mkdir(target)
     
     contents = os.listdir(source + path)
     
     for content in contents:
-        if os.path.isfile(source+path+"/"+content):
+
+        if os.path.isfile(source+path+content):
             dest_file = content.split(".")[0] + ".html"
-            generate_page(source+path+"/"+content,template,target + "/" + dest_file)
+            generate_page(source+path+content,template,target + dest_file, basepath)
         else:
-            generate_pages(source, path + "/" + content, destination, template)
+            generate_pages(source, path + content +"/", destination, template, basepath)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
 
 
